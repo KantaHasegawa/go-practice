@@ -1,12 +1,11 @@
 package models
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-gorp/gorp"
 )
 
 type Thread struct {
@@ -15,10 +14,12 @@ type Thread struct {
 	CreatedAt string `json:"createdAt"`
 }
 
-func (thread Thread) GetAll() ([]byte, error) {
-	thread1 := Thread{1,"first title", "100000"}
-	thread2 := Thread{2,"second title", "200000"}
-	threads := []Thread{thread1, thread2}
+func (thread Thread) GetAll(db *gorp.DbMap) ([]byte, error) {
+	var threads []Thread
+	_, err := db.Select(&threads, "select * from thread")
+	if err !=nil {
+		fmt.Println(err.Error())
+	}
 	result, err := json.Marshal(threads)
 	if err != nil {
 		err := errors.New("json format error:" + err.Error())
@@ -27,10 +28,16 @@ func (thread Thread) GetAll() ([]byte, error) {
 	return result, err
 }
 
-func (thread Thread) Get() *sql.DB {
-	db, err := sql.Open("mysql","root:@(localhost:3306)/go_practice")
-	if(err != nil){
+func (thread Thread) Get(id string, db *gorp.DbMap) ([]byte, error) {
+	thread1 := Thread{}
+	err := db.SelectOne(&thread1, "select * from thread where id=?", id)
+	if err !=nil {
 		fmt.Println(err.Error())
 	}
-	return db
+	result, err := json.Marshal(thread1)
+	if err != nil {
+		err := errors.New("json format error:" + err.Error())
+		return nil, err
+	}
+	return result, err
 }
