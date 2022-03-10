@@ -30,9 +30,10 @@ import (
 
 func main() {
 	router := mux.NewRouter()
-	postController := new(controller.PostController)
-	router.HandleFunc("/posts", postController.PostIndexHandler).Methods("GET")
-	router.HandleFunc("/post/{id}", postController.PostShowHandler).Methods("GET")
+	threadController := new(controller.ThreadController)
+	router.HandleFunc("/threads", threadController.ThreadIndexHandler).Methods("GET")
+	router.HandleFunc("/thread/{id}", threadController.ThreadShowHandler).Methods("GET")
+	router.HandleFunc("/thread/new", threadController.ThreadNewHandler).Methods("POST")
 	http.Handle("/", router)
 	fmt.Println("Server Start Listen to 8080")
 	http.ListenAndServe(":8080", nil)
