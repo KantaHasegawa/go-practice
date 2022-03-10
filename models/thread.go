@@ -1,8 +1,12 @@
 package models
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type Thread struct {
@@ -21,4 +25,12 @@ func (thread Thread) GetAll() ([]byte, error) {
 		return nil, err
 	}
 	return result, err
+}
+
+func (thread Thread) Get() *sql.DB {
+	db, err := sql.Open("mysql","root:@(localhost:3306)/go_practice")
+	if(err != nil){
+		fmt.Println(err.Error())
+	}
+	return db
 }

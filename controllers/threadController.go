@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 
@@ -8,11 +9,12 @@ import (
 )
 
 type ThreadController struct {
-	model models.Thread
+	Model models.Thread
+	Db *sql.DB
 }
 
 func (threadController ThreadController) ThreadIndexHandler(w http.ResponseWriter, r *http.Request){
-	result, err := threadController.model.GetAll()
+	result, err := threadController.Model.GetAll()
 	if(err != nil){
 		fmt.Println(err.Error())
 		fmt.Fprintln(w, "Error: Sorry Server Error...")
@@ -22,6 +24,7 @@ func (threadController ThreadController) ThreadIndexHandler(w http.ResponseWrite
 }
 
 func (threadController ThreadController) ThreadShowHandler(w http.ResponseWriter, r *http.Request){
+	threadController.Model.Get()
 	fmt.Println("show")
 }
 
