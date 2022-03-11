@@ -1,18 +1,20 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"tutorial/models"
+	"tutorial/utils"
 
-	"github.com/go-gorp/gorp"
 	"github.com/gorilla/mux"
 )
 
 type ThreadController struct {
-	Model models.Thread
-	Db *gorp.DbMap
+	Model models.ThreadInterface
+	Db utils.DatabaseInterface
 }
 
 func (threadController ThreadController) ThreadIndexHandler(w http.ResponseWriter, r *http.Request){
@@ -37,5 +39,18 @@ func (threadController ThreadController) ThreadShowHandler(w http.ResponseWriter
 }
 
 func (threadController ThreadController) ThreadNewHandler(w http.ResponseWriter, r *http.Request){
-	fmt.Println("new")
+	body, err := io.ReadAll(r.Body)
+	if(err != nil){
+		fmt.Println(err.Error())
+		fmt.Fprintln(w, "Error: Sorry Server Error...")
+		return
+	}
+	thread := models.Thread{}
+	err = json.Unmarshal(body, &thread)
+	if(err != nil){
+		fmt.Println(err.Error())
+		fmt.Fprintln(w, "Error: Sorry Server Error...")
+		return
+	}
+	fmt.Println(thread)
 }

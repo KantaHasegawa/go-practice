@@ -5,8 +5,13 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/go-gorp/gorp"
+	"tutorial/utils"
 )
+
+type ThreadInterface interface{
+	GetAll(db utils.DatabaseInterface) ([]byte, error)
+	Get(id string, db utils.DatabaseInterface) ([]byte, error)
+}
 
 type Thread struct {
 	Id int `json:"id"`
@@ -14,7 +19,7 @@ type Thread struct {
 	CreatedAt string `json:"createdAt"`
 }
 
-func (thread Thread) GetAll(db *gorp.DbMap) ([]byte, error) {
+func (thread Thread) GetAll(db utils.DatabaseInterface) ([]byte, error) {
 	var threads []Thread
 	_, err := db.Select(&threads, "select * from thread")
 	if err !=nil {
@@ -28,7 +33,7 @@ func (thread Thread) GetAll(db *gorp.DbMap) ([]byte, error) {
 	return result, err
 }
 
-func (thread Thread) Get(id string, db *gorp.DbMap) ([]byte, error) {
+func (thread Thread) Get(id string, db utils.DatabaseInterface) ([]byte, error) {
 	thread1 := Thread{}
 	err := db.SelectOne(&thread1, "select * from thread where id=?", id)
 	if err !=nil {
@@ -40,4 +45,13 @@ func (thread Thread) Get(id string, db *gorp.DbMap) ([]byte, error) {
 		return nil, err
 	}
 	return result, err
+}
+
+func (thread Thread) Create(params Thread, db utils.DatabaseInterface) error {
+	err := db.Insert(params)
+	if err != nil {
+		err := errors.New("insert error:" + err.Error())
+		return err
+	}
+	return nil
 }
